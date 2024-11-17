@@ -32,7 +32,7 @@ router.get('/history', async (_req: Request, res: Response) => {
 router.delete('/history/:id', async (req: Request, res: Response) => {
     try {
         if (!req.params.id) {
-          res.status(400).json({ msg: 'State id is required' });
+          res.status(400).json({ msg: 'City id is required' });
         }
         await HistoryService.removeCity(req.params.id);
         res.json({ success: 'City successfully removed from search history' });

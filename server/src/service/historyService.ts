@@ -20,7 +20,6 @@ class HistoryService {
     }
 
     private async write(cities: City[]) {
-        console.log(`Write cities: ${JSON.stringify(cities)}`)
         return await fs.writeFile('db/searchHistory.json', JSON.stringify(cities,null,'\t'))
     }
 
@@ -50,7 +49,7 @@ class HistoryService {
         const newCity = new City(sanitizedCity, uuidv4());
         return await this.getCities()
             .then(cities => {
-                if(cities.find(index => index.name === city)) return cities
+                if(cities.find(index => index.name.toLowerCase() === city.toLowerCase())) return cities
                 return [...cities,newCity];
             })
             .then(cities => this.write(cities))
