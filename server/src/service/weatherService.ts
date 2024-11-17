@@ -56,27 +56,28 @@ class WeatherService {
         return this.destructureLocationData(locationData);
     }
 
-    // TODO: Create buildWeatherQuery method
-    private buildWeatherQuery(coordinates: Coordinates): string {
-        return `${this.baseURL}/data/2.5/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${this.apiKey}`
-    }
+    // private buildWeatherQuery(coordinates: Coordinates): string {
+    //     return `${this.baseURL}/data/2.5/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${this.apiKey}`
+    // }
 
-    // TODO: Create fetchWeatherData method
-    private async fetchWeatherData(coordinates: Coordinates) {
+    // // TODO: Create fetchWeatherData method
+    // private async fetchWeatherData(coordinates: Coordinates) {
 
-    }
+    // }
 
-    // TODO: Build parseCurrentWeather method
-    private parseCurrentWeather(response: any) {}
+    // // TODO: Build parseCurrentWeather method
+    // private parseCurrentWeather(response: any) {}
 
-    // TODO: Complete buildForecastArray method
-    private buildForecastArray(currentWeather: Weather, weatherData: any[]) {}
+    // // TODO: Complete buildForecastArray method
+    // private buildForecastArray(currentWeather: Weather, weatherData: any[]) {}
 
     // TODO: Complete getWeatherForCity method
     async getWeatherForCity(city: string) {
         this.cityName = city;
 
-        const response = await this.fetchLocationData(this.buildGeocodeQuery())
+        const coord: Coordinates = await this.fetchAndDestructureLocationData()
+        console.log(coord);
+        return coord;
 
     }
 }
