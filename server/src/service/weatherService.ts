@@ -28,9 +28,7 @@ class WeatherService {
         try{
             const response = await fetch(query)
             const locationDatas = await response.json();
-            console.log(locationDatas)//TODO: not sure what this is supposed to be returning
-            console.log(locationDatas.data)
-            return locationDatas.data[0];
+            return locationDatas[0];
         }catch(err) {
             console.log('Error:', err)
             return err;
@@ -52,7 +50,6 @@ class WeatherService {
 
     private async fetchAndDestructureLocationData() {
         const locationData = await this.fetchLocationData(this.buildGeocodeQuery())
-        console.log(locationData) //TODO: remove this if all is good
         return this.destructureLocationData(locationData);
     }
 
@@ -78,7 +75,6 @@ class WeatherService {
         const coord: Coordinates = await this.fetchAndDestructureLocationData()
         console.log(coord);
         return coord;
-
     }
 }
 
