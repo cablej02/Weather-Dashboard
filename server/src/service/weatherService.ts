@@ -66,13 +66,9 @@ class WeatherService {
         return this.destructureLocationData(locationData);
     }
 
-    private buildWeatherQuery(coordinates: Coordinates): string {
-        return `${this.baseURL}/data/2.5/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${this.apiKey}&units=imperial`
-    }
-
-    private async fetchWeatherData(query: string) {
+    private async fetchForecastData(coordinates: Coordinates) {
         try{
-            const response = await fetch(query)
+            const response = await fetch(`${this.baseURL}/data/2.5/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${this.apiKey}&units=imperial`)
             const weatherData = await response.json();
             return weatherData;
         }catch(err) {
@@ -81,47 +77,102 @@ class WeatherService {
         }
     }
 
-    // TODO: Build parseCurrentWeather method
+    private async fetchCurrentWeatherData(coordinates: Coordinates) {
+        try{
+            const response = await fetch(`${this.baseURL}/data/2.5/weather?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${this.apiKey}&units=imperial`)
+            const currentWeatherData = await response.json();
+            return currentWeatherData;
+        }catch(err) {
+            console.log('Error:', err)
+            return err;
+        }
+    }
+
     private parseCurrentWeather(response: any) {
+        const localTime = new Date((response.dt + response.timezone) * 1000);
+
+        //format the date to MM/DD/YYYY
+        const year = localTime.getUTCFullYear();
+        const month = String(localTime.getUTCMonth() + 1).padStart(2, "0");
+        const day = String(localTime.getUTCDate()).padStart(2, "0");
+        const formattedDate = `${month}/${day}/${year}`;
+
         const currentWeather = new Weather(
-            response.city.name,
-            response.list[0].dt_txt,
-            response.list[0].weather[0].icon,
-            response.list[0].weather[0].description,
-            response.list[0].main.temp,
-            response.list[0].wind.speed,
-            response.list[0].main.humidity
+            response.name,
+            formattedDate,
+            response.weather[0].icon,
+            response.weather[0].description,
+            response.main.temp,
+            response.wind.speed,
+            response.main.humidity
         )
 
         return currentWeather;
     }
 
-    // // TODO: Complete buildForecastArray method
-    private buildForecastArray(currentWeather: Weather, weatherData: any[]) {
-        const forecast = weatherData.map((data: any) => {
-            return new Weather(
+    private buildForecastArray(currentWeather: Weather, weatherData: any[], timezone: number) {
+        const forecast: Weather[] = []
+        forecast.push(currentWeather)
+
+        const forecastData: { [key: string]: any } = {}; // Object to hold aggregated data
+        weatherData.forEach((data) => {
+            const localTime = new Date((data.dt + timezone) * 1000);
+
+            //format the date to MM/DD/YYYY
+            const year = localTime.getUTCFullYear();
+            const month = String(localTime.getUTCMonth() + 1).padStart(2, "0");
+            const day = String(localTime.getUTCDate()).padStart(2, "0");
+            const date = `${month}/${day}/${year}`;
+
+            if (!forecastData[date]) {
+                forecastData[date] = {
+                    date: date,
+                    icon: data.weather[0].icon,
+                    iconDescription: data.weather[0].description,
+                    tempF: data.main.temp,
+                    windSpeed: data.wind.speed,
+                    humidity: data.main.humidity
+                }
+            }else{
+                // update the forecast data if time is not after 12:00
+                if(localTime.getHours() < 13){
+                    forecastData[date].icon = data.weather[0].icon;
+                    forecastData[date].iconDescription = data.weather[0].description;
+
+                    forecastData[date].tempF = data.main.temp;
+                    forecastData[date].windSpeed = data.wind.speed;
+                    forecastData[date].humidity = data.main.humidity;
+                }
+            }
+        });
+
+        // add the forecast data to the forecast array
+        for(const key in forecastData){
+            if(key === currentWeather.date) continue;
+            forecast.push(new Weather(
                 currentWeather.city,
-                data.dt_txt,
-                data.weather[0].icon,
-                data.weather[0].description,
-                data.main.temp,
-                data.wind.speed,
-                data.main.humidity
-            )
-        })
+                forecastData[key].date,
+                forecastData[key].icon,
+                forecastData[key].iconDescription,
+                forecastData[key].tempF,
+                forecastData[key].windSpeed,
+                forecastData[key].humidity
+            ))
+        }
 
         return forecast;
-
     }
 
-    // TODO: Complete getWeatherForCity method
     async getWeatherForCity(city: string) {
         this.cityName = city;
         try{
             const coord: Coordinates = await this.fetchAndDestructureLocationData()
-            const weatherData = await this.fetchWeatherData(this.buildWeatherQuery(coord))
-            const currentWeather = this.parseCurrentWeather(weatherData)
-            const forecast = this.buildForecastArray(currentWeather, weatherData.list)
+
+            const currentWeatherData = await this.fetchCurrentWeatherData(coord)
+            const forecastData = await this.fetchForecastData(coord)
+
+            const currentWeather: Weather = this.parseCurrentWeather(currentWeatherData)
+            const forecast: Weather[] = this.buildForecastArray(currentWeather, forecastData.list, forecastData.city.timezone)
 
             return forecast;
         }catch(err){

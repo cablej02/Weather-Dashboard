@@ -4,7 +4,15 @@
 		"id": "3c92db79-8b86-4b78-962f-18b52cd7881c"
 	},
 	{
-		"name": "Madison",
-		"id": "5207c48b-3fa7-4011-a643-c2d97b2ac92f"
+		"name": "New York",
+		"id": "e6ffb3ac-c180-4b91-8289-6afe5c9e0280"
+	},
+	{
+		"name": "Orlando",
+		"id": "0cc89fb4-cde7-4bfd-846b-d18e71f1a24b"
+	},
+	{
+		"name": "Seoul",
+		"id": "47437371-3439-4e97-b733-158ff56476d0"
 	}
 ]
