@@ -20,7 +20,8 @@ class HistoryService {
     }
 
     private async write(cities: City[]) {
-        return await fs.writeFile('db.searchHistory.json', JSON.stringify(cities,null,'\t'))
+        console.log(`Write cities: ${JSON.stringify(cities)}`)
+        return await fs.writeFile('db/searchHistory.json', JSON.stringify(cities,null,'\t'))
     }
 
     async getCities() {
@@ -41,8 +42,12 @@ class HistoryService {
     async addCity(city: string) {
         if(!city) throw new Error('city cannot be blank');
 
-        const newCity = new City(city, uuidv4());
-        
+        const sanitizedCity: string = city
+            .split(' ')
+            .map(word => word[0].toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
+
+        const newCity = new City(sanitizedCity, uuidv4());
         return await this.getCities()
             .then(cities => {
                 if(cities.find(index => index.name === city)) return cities

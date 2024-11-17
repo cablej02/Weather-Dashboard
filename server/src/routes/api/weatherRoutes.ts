@@ -10,8 +10,7 @@ router.post('/', async (req: Request, res: Response) => {
         const cityName = req.body.cityName;
         const weather = await WeatherService.getWeatherForCity(cityName)
         console.log(weather)
-        const sanitizedCityName = cityName[0].toLowerCase() + cityName.slice(1).toLowerCase()
-        await HistoryService.addCity(sanitizedCityName)
+        await HistoryService.addCity(cityName)
         res.json(weather)
 
     }catch(err){
