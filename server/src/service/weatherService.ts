@@ -133,9 +133,7 @@ class WeatherService {
                     humidity: data.main.humidity
                 }
             }else{
-                //TODO: update this logic
                 // update the forecast data if time is before 15:00
-                console.log(date, localTime.getUTCHours(), data.main.temp)
                 if(localTime.getUTCHours() < 15){
                     forecastData[date].icon = data.weather[0].icon;
                     forecastData[date].iconDescription = data.weather[0].description;
