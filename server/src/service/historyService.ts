@@ -14,7 +14,7 @@ class City{
 class HistoryService {
     private async read() {
         return await fs.readFile('db/searchHistory.json', {
-            flag: 'a+', //TODO: Not sure what this is doing. look into it
+            flag: 'a+', // file is created if it does not exist
             encoding: 'utf-8'
         })
     }

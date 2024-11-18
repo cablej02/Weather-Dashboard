@@ -26,7 +26,6 @@ class Weather{
     }
 }
 
-// TODO: Complete the WeatherService class
 class WeatherService {
     private baseURL?: string;
     private apiKey?: string;
@@ -34,7 +33,7 @@ class WeatherService {
     constructor() {
         this.baseURL = process.env.API_BASE_URL || '';
         this.apiKey = process.env.API_KEY || '';
-        //TODO: set city name to something default?  can we get current location somehow?
+        //TODO: set city name to something default? or leave it as undefined?
     }
 
     private async fetchLocationData(query: string) {
@@ -134,8 +133,10 @@ class WeatherService {
                     humidity: data.main.humidity
                 }
             }else{
-                // update the forecast data if time is not after 12:00
-                if(localTime.getHours() < 13){
+                //TODO: update this logic
+                // update the forecast data if time is before 15:00
+                console.log(date, localTime.getUTCHours(), data.main.temp)
+                if(localTime.getUTCHours() < 15){
                     forecastData[date].icon = data.weather[0].icon;
                     forecastData[date].iconDescription = data.weather[0].description;
 
